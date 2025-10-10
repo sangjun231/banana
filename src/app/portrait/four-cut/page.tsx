@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, Sparkles, Upload } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import ImageUpload from "@/components/features/four-cut/ImageUpload";
@@ -35,7 +36,13 @@ export default function FourCutPage() {
       });
 
       const data = await response.json();
-      setResult(data.result);
+
+      if (data.generatedImage) {
+        // base64 이미지로 설정
+        setResult(`data:image/png;base64,${data.generatedImage}`);
+      } else {
+        setResult(data.description || "생성 완료");
+      }
     } catch (error) {
       console.error("Error generating portrait:", error);
       alert("포트레이트 생성 중 오류가 발생했습니다");
@@ -119,14 +126,25 @@ export default function FourCutPage() {
                 <div className="space-y-4">
                   <div className="aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
                     {/* 결과 이미지 표시 */}
-                    <div className="flex h-full items-center justify-center">
-                      <p className="text-gray-500 text-sm">{result}</p>
-                    </div>
+                    {result.startsWith("data:image") ? (
+                      <Image
+                        src={result}
+                        alt="Generated portrait"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <p className="text-gray-500 text-sm">{result}</p>
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1">
-                      다운로드
-                    </Button>
+                    <a href={result} download="portrait.png">
+                      <Button variant="outline" className="w-full">
+                        다운로드
+                      </Button>
+                    </a>
                     <Button className="flex-1">공유하기</Button>
                   </div>
                 </div>
