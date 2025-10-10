@@ -8,16 +8,18 @@ import ImageUpload from "@/components/features/four-cut/ImageUpload";
 import MoodSelector from "@/components/features/four-cut/MoodSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/client";
+import { base64ToBlob, combineImagesVertically } from "@/utils/image";
 
 export default function FourCutPage() {
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [selectedMood, setSelectedMood] = useState<string>("");
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
   const handleGenerate = async () => {
-    if (!uploadedImage || !selectedMood) {
-      alert("이미지와 분위기를 선택해주세요");
+    if (uploadedImages.length === 0 || !selectedMood) {
+      alert("이미지를 최소 1장 이상 업로드하고 분위기를 선택해주세요");
       return;
     }
 
@@ -30,19 +32,43 @@ export default function FourCutPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          image: uploadedImage,
+          images: uploadedImages,
           mood: selectedMood,
         }),
       });
 
       const data = await response.json();
 
-      if (data.generatedImage) {
-        // base64 이미지로 설정
-        setResult(`data:image/png;base64,${data.generatedImage}`);
-      } else {
-        setResult(data.description || "생성 완료");
+      if (!data.success) {
+        throw new Error(data.error || "생성 실패");
       }
+
+      const generatedImages = data.generatedImages || [data.generatedImage];
+      const combinedImageUrl = await combineImagesVertically(generatedImages);
+
+      // Supabase Storage에 저장
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const blob = base64ToBlob(combinedImageUrl);
+        const fileName = `${user.id}/${Date.now()}-four-cut.png`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("users")
+          .upload(`portrait_four-cut/${fileName}`, blob, {
+            contentType: "image/png",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          console.error("Storage upload error:", uploadError);
+        }
+      }
+
+      setResult(combinedImageUrl);
     } catch (error) {
       console.error("Error generating portrait:", error);
       alert("포트레이트 생성 중 오류가 발생했습니다");
@@ -85,7 +111,7 @@ export default function FourCutPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ImageUpload onImageUpload={setUploadedImage} />
+                <ImageUpload onImageUpload={setUploadedImages} />
               </CardContent>
             </Card>
 
@@ -108,11 +134,15 @@ export default function FourCutPage() {
             {/* Generate Button */}
             <Button
               onClick={handleGenerate}
-              disabled={!uploadedImage || !selectedMood || generating}
+              disabled={
+                uploadedImages.length === 0 || !selectedMood || generating
+              }
               className="w-full"
               size="lg"
             >
-              {generating ? "생성 중..." : "인생네컷 생성하기"}
+              {generating
+                ? "생성 중..."
+                : `인생네컷 생성하기 (${uploadedImages.length}/4)`}
             </Button>
           </div>
 
@@ -124,23 +154,25 @@ export default function FourCutPage() {
             <CardContent>
               {result ? (
                 <div className="space-y-4">
-                  <div className="aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
+                  <div className="max-h-[600px] overflow-auto rounded-lg bg-gray-100">
                     {/* 결과 이미지 표시 */}
                     {result.startsWith("data:image") ? (
                       <Image
                         src={result}
                         alt="Generated portrait"
-                        fill
-                        className="object-cover"
+                        width={800}
+                        height={3200}
+                        className="h-auto w-full"
+                        unoptimized
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center">
+                      <div className="flex h-full items-center justify-center p-8">
                         <p className="text-gray-500 text-sm">{result}</p>
                       </div>
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <a href={result} download="portrait.png">
+                    <a href={result} download="portrait.png" className="flex-1">
                       <Button variant="outline" className="w-full">
                         다운로드
                       </Button>
