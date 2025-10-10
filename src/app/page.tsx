@@ -1,103 +1,128 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
-    <div className="grid min-h-screen grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 pb-20 font-sans sm:p-20">
-      <main className="row-start-2 flex flex-col items-center gap-[32px] sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-center font-mono text-sm/6 sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="rounded bg-black/[.05] px-1 py-0.5 font-mono font-semibold dark:bg-white/[.06]">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 p-8">
+      <div className="mx-auto max-w-6xl">
+        {/* Header */}
+        <header className="mb-12 flex items-center justify-between">
+          <div>
+            <h1 className="font-bold text-4xl text-gray-800">인생네컷 AI 🎨</h1>
+            <p className="mt-2 text-gray-600">
+              AI로 특별한 순간을 포트레이트로 만들어보세요
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            {user ? (
+              <>
+                <p className="text-gray-600 text-sm">{user.email}</p>
+                <form
+                  action={async () => {
+                    "use server";
+                    const supabase = await createClient();
+                    await supabase.auth.signOut();
+                  }}
+                >
+                  <Button variant="outline" type="submit">
+                    로그아웃
+                  </Button>
+                </form>
+              </>
+            ) : (
+              <Link href="/login">
+                <Button>로그인</Button>
+              </Link>
+            )}
+          </div>
+        </header>
 
-        <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <a
-            className="flex h-10 items-center justify-center gap-2 rounded-full border border-transparent border-solid bg-foreground px-4 font-medium text-background text-sm transition-colors hover:bg-[#383838] sm:h-12 sm:w-auto sm:px-5 sm:text-base dark:hover:bg-[#ccc]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        {/* Main Content */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* 인생네컷 카드 */}
+          <Link
+            href="/portrait/four-cut"
+            className="transition-transform hover:scale-105"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="flex h-10 w-full items-center justify-center rounded-full border border-black/[.08] border-solid px-4 font-medium text-sm transition-colors hover:border-transparent hover:bg-[#f2f2f2] sm:h-12 sm:w-auto sm:px-5 sm:text-base md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <Card className="h-full border-2 border-purple-200 bg-gradient-to-br from-purple-100 to-pink-100">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  📸 인생네컷
+                </CardTitle>
+                <CardDescription>
+                  4컷 스타일의 포트레이트를 생성하세요
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 text-sm">
+                  사진을 업로드하고 원하는 분위기를 선택하면 AI가 멋진 인생네컷
+                  스타일 포트레이트를 만들어드립니다.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* 포트레이트 카드 (준비중) */}
+          <Card className="h-full opacity-60">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                🎭 포트레이트
+              </CardTitle>
+              <CardDescription>곧 출시됩니다</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 text-sm">
+                전문가급 포트레이트 사진을 AI로 생성해보세요.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* 웨딩 사진 카드 (준비중) */}
+          <Card className="h-full opacity-60">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                💒 웨딩 사진
+              </CardTitle>
+              <CardDescription>곧 출시됩니다</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 text-sm">
+                AI로 웨딩 사진 가이드라인을 제공받으세요.
+              </p>
+            </CardContent>
+          </Card>
         </div>
-      </main>
-      <footer className="row-start-3 flex flex-wrap items-center justify-center gap-[24px]">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Recent Works (스켈레톤) */}
+        <div className="mt-12">
+          <h2 className="mb-6 font-bold text-2xl text-gray-800">최근 작업</h2>
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i} className="animate-pulse">
+                <div className="aspect-square bg-gray-200"></div>
+                <CardContent className="pt-4">
+                  <div className="h-4 w-3/4 rounded bg-gray-200"></div>
+                  <div className="mt-2 h-3 w-1/2 rounded bg-gray-200"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

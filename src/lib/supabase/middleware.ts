@@ -24,7 +24,7 @@ export async function updateSession(request: NextRequest) {
           });
         },
       },
-    }
+    },
   );
 
   // 세션 갱신
@@ -35,7 +35,7 @@ export async function updateSession(request: NextRequest) {
   // 보호된 라우트 체크 (서비스 페이지들만)
   const protectedRoutes = ["/portrait"];
   const isProtectedRoute = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
+    request.nextUrl.pathname.startsWith(route),
   );
 
   // 비로그인 상태에서 보호된 라우트 접근시 로그인으로 보냄
