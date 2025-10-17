@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowLeft, Sparkles, Upload } from "lucide-react";
+import { ArrowLeft, Palette, Sparkles, Upload } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import ImageUpload from "@/components/features/four-cut/ImageUpload";
 import MoodSelector from "@/components/features/four-cut/MoodSelector";
+import StyleTypeSelector from "@/components/features/four-cut/StyleTypeSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
@@ -13,28 +14,44 @@ import { base64ToBlob, combineImagesVertically } from "@/utils/image";
 
 export default function FourCutPage() {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [selectedStyleType, setSelectedStyleType] = useState<string>("");
   const [selectedMood, setSelectedMood] = useState<string>("");
   const [generating, setGenerating] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
   const handleGenerate = async () => {
-    if (uploadedImages.length === 0 || !selectedMood) {
-      alert("이미지를 최소 1장 이상 업로드하고 분위기를 선택해주세요");
+    if (uploadedImages.length === 0 || !selectedStyleType || !selectedMood) {
+      alert("이미지를 업로드하고 스타일 타입과 분위기를 모두 선택해주세요");
       return;
     }
 
     setGenerating(true);
 
     try {
+      const requestBody: any = {
+        images: uploadedImages,
+        styleType: selectedStyleType,
+        mood: selectedMood,
+      };
+
+      // 프레임 추가 모드: 이미지들을 여백 추가해서 합쳐서 전송
+      // 여백 부분을 AI가 채울 것
+      if (selectedStyleType === "frame-add") {
+        console.log("🖼️ Combining images with padding before sending...");
+        const combinedImageUrl = await combineImagesVertically(
+          uploadedImages,
+          true, // 여백 추가 - 여백 부분을 AI가 채울 것
+        );
+        const combinedBase64 = combinedImageUrl.split(",")[1]; // data:image/png;base64, 제거
+        requestBody.combinedImage = combinedBase64;
+      }
+
       const response = await fetch("/api/portrait/four-cut", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          images: uploadedImages,
-          mood: selectedMood,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
@@ -43,8 +60,16 @@ export default function FourCutPage() {
         throw new Error(data.error || "생성 실패");
       }
 
-      const generatedImages = data.generatedImages || [data.generatedImage];
-      const combinedImageUrl = await combineImagesVertically(generatedImages);
+      let finalImageUrl: string;
+
+      if (data.isCombined) {
+        // 프레임 모드: 이미 합쳐진 결과
+        finalImageUrl = `data:image/png;base64,${data.generatedImage}`;
+      } else {
+        // 배경 변환 모드: 개별 이미지들을 합치기
+        const generatedImages = data.generatedImages || [data.generatedImage];
+        finalImageUrl = await combineImagesVertically(generatedImages);
+      }
 
       // Supabase Storage에 저장
       const supabase = createClient();
@@ -53,7 +78,7 @@ export default function FourCutPage() {
       } = await supabase.auth.getUser();
 
       if (user) {
-        const blob = base64ToBlob(combinedImageUrl);
+        const blob = base64ToBlob(finalImageUrl);
         const fileName = `${user.id}/${Date.now()}-four-cut.png`;
 
         const { data: uploadData, error: uploadError } = await supabase.storage
@@ -68,7 +93,7 @@ export default function FourCutPage() {
         }
       }
 
-      setResult(combinedImageUrl);
+      setResult(finalImageUrl);
     } catch (error) {
       console.error("Error generating portrait:", error);
       alert("포트레이트 생성 중 오류가 발생했습니다");
@@ -115,6 +140,22 @@ export default function FourCutPage() {
               </CardContent>
             </Card>
 
+            {/* Style Type Selection */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="h-5 w-5" />
+                  스타일 타입
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <StyleTypeSelector
+                  selectedType={selectedStyleType}
+                  onTypeSelect={setSelectedStyleType}
+                />
+              </CardContent>
+            </Card>
+
             {/* Mood Selection */}
             <Card>
               <CardHeader>
@@ -135,7 +176,10 @@ export default function FourCutPage() {
             <Button
               onClick={handleGenerate}
               disabled={
-                uploadedImages.length === 0 || !selectedMood || generating
+                uploadedImages.length === 0 ||
+                !selectedStyleType ||
+                !selectedMood ||
+                generating
               }
               className="w-full"
               size="lg"
@@ -185,7 +229,9 @@ export default function FourCutPage() {
                   <div className="text-center">
                     <Sparkles className="mx-auto h-12 w-12 text-gray-400" />
                     <p className="mt-4 text-gray-500 text-sm">
-                      이미지를 업로드하고 분위기를 선택하면
+                      이미지를 업로드하고
+                      <br />
+                      스타일 타입과 분위기를 선택하면
                       <br />
                       여기에 결과가 표시됩니다
                     </p>
