@@ -1,5 +1,6 @@
 export async function combineImagesVertically(
   base64Images: string[],
+  addPadding = false, // 프레임용 여백 추가 옵션
 ): Promise<string> {
   if (base64Images.length === 0) {
     throw new Error("이미지가 없습니다");
@@ -22,9 +23,15 @@ export async function combineImagesVertically(
   const width = firstImg.width;
   const height = firstImg.height;
 
-  // Canvas 크기 설정 (4장을 세로로)
-  canvas.width = width;
-  canvas.height = height * base64Images.length;
+  // 여백 설정 (프레임 모드일 때)
+  const padding = addPadding ? 60 : 0; // 상하좌우 60px 여백
+  const innerSpacing = addPadding ? 10 : 0; // 이미지 간 간격
+
+  // Canvas 크기 설정
+  const totalInnerSpacing = innerSpacing * (base64Images.length - 1);
+  canvas.width = width + padding * 2;
+  canvas.height =
+    height * base64Images.length + padding * 2 + totalInnerSpacing;
 
   // 흰 배경
   ctx.fillStyle = "#ffffff";
@@ -33,7 +40,8 @@ export async function combineImagesVertically(
   // 각 이미지를 세로로 배치
   for (let i = 0; i < base64Images.length; i++) {
     const img = await loadImage(`data:image/png;base64,${base64Images[i]}`);
-    ctx.drawImage(img, 0, i * height, width, height);
+    const y = padding + i * (height + innerSpacing);
+    ctx.drawImage(img, padding, y, width, height);
   }
 
   // Canvas를 base64로 변환
