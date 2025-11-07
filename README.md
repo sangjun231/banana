@@ -5,7 +5,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - 🎨 AI 포트레이트 생성 (Gemini API)
 - 🔐 사용자 인증 (Supabase)
 - 🐛 에러 모니터링 (Sentry + Slack 연동)
-- 🧪 테스트 환경 (예정: Vitest, React Testing Library, Playwright)
+- 🧪 테스트 환경 (Vitest, React Testing Library, Playwright)
 
 ## Getting Started
 
@@ -61,6 +61,27 @@ Sentry가 제대로 작동하는지 테스트하려면:
 3. Slack 채널과 Sentry 대시보드에서 알림 확인
 
 자세한 사용법은 [SENTRY_SETUP.md](./SENTRY_SETUP.md)를 참고하세요.
+
+## 테스트
+
+### 유닛 테스트 및 통합 테스트
+
+```bash
+pnpm test
+pnpm test:unit
+pnpm test:integration
+pnpm test:watch
+pnpm test:ui
+```
+
+### E2E 테스트
+
+```bash
+pnpm test:e2e
+pnpm test:e2e:ui
+```
+
+자세한 테스트 가이드는 [docs/how-to-test.md](./docs/how-to-test.md)를 참고하세요.
 
 ## Learn More
 
