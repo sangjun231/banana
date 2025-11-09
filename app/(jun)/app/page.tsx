@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/(jun)/server";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -44,7 +44,7 @@ export default async function Home() {
                 </form>
               </>
             ) : (
-              <Link href="/login">
+              <Link href="app/login">
                 <Button>로그인</Button>
               </Link>
             )}
@@ -55,7 +55,7 @@ export default async function Home() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* 인생네컷 카드 */}
           <Link
-            href="/portrait/four-cut"
+            href="app/portrait/four-cut"
             className="transition-transform hover:scale-105"
           >
             <Card className="h-full border-2 border-purple-200 bg-gradient-to-br from-purple-100 to-pink-100">
@@ -77,34 +77,38 @@ export default async function Home() {
           </Link>
 
           {/* 포트레이트 카드 (준비중) */}
-          <Card className="h-full opacity-60">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                🎭 포트레이트
-              </CardTitle>
-              <CardDescription>곧 출시됩니다</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 text-sm">
-                전문가급 포트레이트 사진을 AI로 생성해보세요.
-              </p>
-            </CardContent>
-          </Card>
+          <Link href="app/sentry-example-page">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  🎭 공식 sentry
+                </CardTitle>
+                <CardDescription>원본 상태</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 text-sm">
+                  프론트엔드, api에러 sentry 로그 확인
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
 
           {/* 웨딩 사진 카드 (준비중) */}
-          <Card className="h-full opacity-60">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                💒 웨딩 사진
-              </CardTitle>
-              <CardDescription>곧 출시됩니다</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 text-sm">
-                AI로 웨딩 사진 가이드라인을 제공받으세요.
-              </p>
-            </CardContent>
-          </Card>
+          <Link href="app/test-sentry">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  💒 임의 sentry
+                </CardTitle>
+                <CardDescription>sentry 대쉬보드 기록 가능</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 text-sm">
+                  클라이언트, 서버 테스트에러로 sentry 로그 확인
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* Recent Works (스켈레톤) */}

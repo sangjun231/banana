@@ -9,7 +9,7 @@ import MoodSelector from "@/components/features/four-cut/MoodSelector";
 import StyleTypeSelector from "@/components/features/four-cut/StyleTypeSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/(jun)/client";
 import { base64ToBlob, combineImagesVertically } from "@/utils/image";
 
 export default function FourCutPage() {
@@ -46,7 +46,7 @@ export default function FourCutPage() {
         requestBody.combinedImage = combinedBase64;
       }
 
-      const response = await fetch("/api/portrait/four-cut", {
+      const response = await fetch("/app/api/portrait/four-cut", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -108,7 +108,7 @@ export default function FourCutPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/">
+            <Link href="/app">
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
