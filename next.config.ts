@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   // Next.js 15.5.4에서는 instrumentationHook이 기본값이므로 제거
 };
 
+const isProd = process.env.NODE_ENV === "production";
+
 export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
@@ -27,7 +29,10 @@ export default withSentryConfig(nextConfig, {
   // This can increase your server load as well as your hosting bill.
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
-  tunnelRoute: "/monitoring",
+
+  // 개발 환경에서는 로컬 서버에 /monitoring 엔드포인트가 없으므로 끄고,
+  // 프로덕션에서만 활성화하여 광고 차단 등을 우회합니다.
+  ...(isProd ? { tunnelRoute: "/monitoring" } : {}),
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
@@ -36,5 +41,5 @@ export default withSentryConfig(nextConfig, {
   // See the following for more information:
   // https://docs.sentry.io/product/crons/
   // https://vercel.com/docs/cron-jobs
-  automaticVercelMonitors: true
+  automaticVercelMonitors: true,
 });
