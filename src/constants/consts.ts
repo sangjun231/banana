@@ -17,4 +17,12 @@ export const SIDEBAR_MENU = [
     label: "영정사진",
     href: "/memorial",
   },
+  {
+    label: "eun 홈",
+    href: "/",
+  },
+  {
+    label: "jun 홈",
+    href: "/app",
+  },
 ];
