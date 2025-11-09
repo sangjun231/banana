@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generatePortrait } from "@/lib/gemini/client";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/(jun)/server";
 
 // 첫 번째 이미지 배경 변환용 프롬프트 (배경 스타일 생성)
 const backgroundFirstPrompts: Record<string, string> = {

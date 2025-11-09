@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/(jun)/client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -37,7 +37,7 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push("/");
+      router.push("/app");
       router.refresh();
     }
   };
