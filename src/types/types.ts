@@ -1,3 +1,3 @@
 import { Tables } from "./supabase";
 
-export type NanoBanana = Tables<"nano-banana">;
+export type Portrait = Tables<"portrait">;

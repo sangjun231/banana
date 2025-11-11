@@ -9,8 +9,8 @@ export const GEN_CATEGORY = {
   MEMORIAL: "memorial",
 };
 
-export const STORAGE_BUCKET = "nano-banana";
-export const TABLE_NAME = "nano-banana";
+export const STORAGE_BUCKET = "users";
+export const TABLE_NAME = "portrait";
 
 export const SIDEBAR_MENU = [
   {
