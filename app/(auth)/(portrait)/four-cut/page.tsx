@@ -77,12 +77,12 @@ export default function FourCutPage() {
 
       if (user) {
         const blob = base64ToBlob(finalImageUrl);
-        const fileName = `${user.id}/${Date.now()}-four-cut.png`;
+        const fileName = `${user.id}/${Date.now()}_four-cut.webp`;
 
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("users")
           .upload(`portrait_four-cut/${fileName}`, blob, {
-            contentType: "image/png",
+            contentType: "image/webp",
             upsert: false,
           });
 
