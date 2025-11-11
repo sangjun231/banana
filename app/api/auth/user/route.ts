@@ -25,7 +25,7 @@ export async function GET() {
 
       return NextResponse.json(
         { user: null, error: "Auth session missing!" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -39,7 +39,7 @@ export async function GET() {
 
       return NextResponse.json(
         { user: null, error: "Refresh token not found" },
-        { status: 401 },
+        { status: 401 }
       );
     }
     return NextResponse.json({ error: error.message }, { status: 500 });

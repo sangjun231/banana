@@ -18,11 +18,11 @@ export const SIDEBAR_MENU = [
     href: "/memorial",
   },
   {
-    label: "eun 홈",
-    href: "/",
+    label: "인생네컷",
+    href: "/four-cut",
   },
   {
-    label: "jun 홈",
-    href: "/app",
+    label: "메인",
+    href: "/",
   },
 ];

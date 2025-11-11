@@ -9,7 +9,7 @@ import MoodSelector from "@/components/features/four-cut/MoodSelector";
 import StyleTypeSelector from "@/components/features/four-cut/StyleTypeSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/(jun)/client";
+import supabase from "@/lib/supabase/client";
 import { base64ToBlob, combineImagesVertically } from "@/utils/image";
 
 export default function FourCutPage() {
@@ -40,13 +40,13 @@ export default function FourCutPage() {
         console.log("🖼️ Combining images with padding before sending...");
         const combinedImageUrl = await combineImagesVertically(
           uploadedImages,
-          true, // 여백 추가 - 여백 부분을 AI가 채울 것
+          true // 여백 추가 - 여백 부분을 AI가 채울 것
         );
         const combinedBase64 = combinedImageUrl.split(",")[1]; // data:image/png;base64, 제거
         requestBody.combinedImage = combinedBase64;
       }
 
-      const response = await fetch("/app/api/portrait/four-cut", {
+      const response = await fetch("/api/portrait/four-cut", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -71,8 +71,6 @@ export default function FourCutPage() {
         finalImageUrl = await combineImagesVertically(generatedImages);
       }
 
-      // Supabase Storage에 저장
-      const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -108,7 +106,7 @@ export default function FourCutPage() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/app">
+            <Link href="/">
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="h-5 w-5" />
               </Button>

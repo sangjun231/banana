@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -13,7 +14,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/(jun)/client";
+import { QUERY_KEYS } from "@/constants/consts";
+import supabase from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -21,7 +23,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-  const supabase = createClient();
+  const queryClient = useQueryClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +39,8 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push("/app");
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.USER] });
+      router.replace("/");
       router.refresh();
     }
   };
@@ -56,6 +59,7 @@ export default function LoginPage() {
       setLoading(false);
     } else {
       setError("회원가입 성공! 이메일을 확인해주세요.");
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.USER] });
       setLoading(false);
     }
   };
