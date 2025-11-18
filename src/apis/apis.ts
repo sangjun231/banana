@@ -1,6 +1,6 @@
 import { User } from "@supabase/supabase-js";
 import { ApiConfig } from "@/types/api-types";
-import { NanoBanana } from "@/types/types";
+import { Portrait } from "@/types/types";
 import { BaseApiClient } from "./base-axios-client";
 
 class ApiClient extends BaseApiClient {
@@ -62,7 +62,7 @@ class ApiClient extends BaseApiClient {
 
   // 하나의 특정한 이미지 조회
   public getMemorialPhoto = (id: string, category: string) => {
-    return this.get<NanoBanana>(`/api/image/${id}`, {
+    return this.get<Portrait>(`/api/image/${id}`, {
       params: {
         category,
       },
@@ -71,7 +71,7 @@ class ApiClient extends BaseApiClient {
 
   // 유저의 모든 이미지 조회
   public getMemorialPhotos = (category: string) => {
-    return this.get<NanoBanana[]>(`/api/image`, {
+    return this.get<Portrait[]>(`/api/image`, {
       params: {
         category,
       },

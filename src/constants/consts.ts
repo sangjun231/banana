@@ -9,8 +9,8 @@ export const GEN_CATEGORY = {
   MEMORIAL: "memorial",
 };
 
-export const STORAGE_BUCKET = "nano-banana";
-export const TABLE_NAME = "nano-banana";
+export const STORAGE_BUCKET = "users";
+export const TABLE_NAME = "portrait";
 
 export const SIDEBAR_MENU = [
   {
@@ -18,11 +18,11 @@ export const SIDEBAR_MENU = [
     href: "/memorial",
   },
   {
-    label: "eun 홈",
-    href: "/",
+    label: "인생네컷",
+    href: "/four-cut",
   },
   {
-    label: "jun 홈",
-    href: "/app",
+    label: "메인",
+    href: "/",
   },
 ];

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   if (!category) {
     return NextResponse.json(
       { error: ERROR_MESSAGE.INVALID_CATEGORY },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       console.error(userError);
       return NextResponse.json(
         { error: ERROR_MESSAGE.UNAUTHORIZED },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -52,8 +52,11 @@ export async function POST(request: NextRequest) {
       .webp({ quality: 100 }) // Adjust quality as needed (0-100)
       .toBuffer();
 
+    // 파일 이름을 고유 경로로 사용 하도록 설정
+    const fileName = `${user.user.id}/${Date.now()}_ID-photo.webp`;
+
     // 4. 고유 파일 경로 생성
-    filePath = `gen/${Date.now()}-${user.user.email}-${uuidv4()}.webp`;
+    filePath = `portrait_ID-photo/${fileName}`;
 
     // 5. webpBuffer 를 supabase.storage.from("images").upload 로 업로드
     const { error: uploadError } = await supabase.storage
@@ -127,7 +130,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(
           { error: ERROR_MESSAGE.FAILED_TO_INSERT_TABLE_NANO_BANANA },
-          { status: 500 },
+          { status: 500 }
         );
       } else if (
         error.message === ERROR_MESSAGE.FAILED_TO_UPLOAD_IMAGE ||
@@ -148,7 +151,7 @@ export async function POST(request: NextRequest) {
               ERROR_MESSAGE.FAILED_TO_UPLOAD_IMAGE ||
               ERROR_MESSAGE.FAILED_TO_GET_PUBLIC_URL,
           },
-          { status: 500 },
+          { status: 500 }
         );
       }
     } else {
@@ -157,7 +160,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { error: ERROR_MESSAGE.INTERNAL_SERVER_ERROR },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -170,7 +173,7 @@ export async function GET(request: NextRequest) {
   if (!category) {
     return NextResponse.json(
       { error: ERROR_MESSAGE.INVALID_CATEGORY },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
@@ -182,7 +185,7 @@ export async function GET(request: NextRequest) {
       console.error(userError);
       return NextResponse.json(
         { error: ERROR_MESSAGE.UNAUTHORIZED },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -197,14 +200,14 @@ export async function GET(request: NextRequest) {
       console.error(error);
       return NextResponse.json(
         { error: ERROR_MESSAGE.INTERNAL_SERVER_ERROR },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     if (!data) {
       return NextResponse.json(
         { error: ERROR_MESSAGE.NOT_FOUND },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -213,7 +216,7 @@ export async function GET(request: NextRequest) {
     console.error(error);
     return NextResponse.json(
       { error: ERROR_MESSAGE.INTERNAL_SERVER_ERROR },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
