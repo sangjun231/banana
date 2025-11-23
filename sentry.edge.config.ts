@@ -9,9 +9,13 @@ Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
   // 성능 모니터링 비활성화 (로그 스팸 방지)
-  tracesSampleRate: 0, // 원본: 1
+  // tracesSampleRate: 0, // 원본: 1
   // 원본 (Wizard 기본값):
   // tracesSampleRate: 1,
+
+  // 성능 모니터링 설정 (추가)
+  // 개발 환경에서는 낮은 샘플링, 프로덕션에서는 더 높은 샘플링 사용 가능
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0, // 프로덕션: 10%, 개발: 100%
 
   // 디버그 모드 비활성화
   debug: false,
