@@ -39,10 +39,11 @@ export default function TestSentryPage() {
 
   const handleServerError = async () => {
     try {
-      const response = await fetch("/app/api/test-sentry");
+      const response = await fetch("/api/sentry/test-sentry");
       const data = await response.json();
       alert(data.message);
     } catch (error) {
+      console.error("서버 에러 ====>", error);
       alert("서버 에러 발생!");
     }
   };
