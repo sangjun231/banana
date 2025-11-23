@@ -4,6 +4,14 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   // Next.js 15.5.4에서는 instrumentationHook이 기본값이므로 제거
+
+  // OpenTelemetry instrumentation이 사용하는 패키지들을 external로 처리
+  // 이 패키지들은 Sentry와 OpenTelemetry의 의존성으로 사용되며,
+  // Node.js 런타임에서 모듈을 동적으로 instrument하기 위해 필요합니다.
+  serverExternalPackages: [
+    "import-in-the-middle",
+    "require-in-the-middle",
+  ],
 };
 
 const isProd = process.env.NODE_ENV === "production";
