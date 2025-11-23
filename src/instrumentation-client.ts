@@ -30,7 +30,7 @@ Sentry.init({
     // 개발 환경에서는 콘솔에도 출력
     console.error(
       "Sentry Client Error:",
-      hint.originalException || hint.syntheticException,
+      hint.originalException || hint.syntheticException
     );
     return event;
   },
