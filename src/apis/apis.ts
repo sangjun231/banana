@@ -77,6 +77,14 @@ class ApiClient extends BaseApiClient {
       },
     });
   };
+
+  public getMyImages = () => {
+    return this.get<Portrait[]>("/api/image/my-page");
+  };
+
+  public deleteImage = (id: string) => {
+    return this.delete<void>(`/api/image/${id}`);
+  };
 }
 
 const api = new ApiClient();
