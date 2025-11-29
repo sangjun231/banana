@@ -4,6 +4,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   // Next.js 15.5.4에서는 instrumentationHook이 기본값이므로 제거
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "fvfkehhaxxhaapfajddv.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
 };
 
 const isProd = process.env.NODE_ENV === "production";
