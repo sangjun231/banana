@@ -15,3 +15,10 @@ export const useGetMemorialPhotoQuery = (id: string, category: string) => {
     queryFn: () => api.getMemorialPhoto(id, category),
   });
 };
+
+export const useMyImagesQuery = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.MY_IMAGES],
+    queryFn: () => api.getMyImages(),
+  });
+};

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   if (!category) {
     return NextResponse.json(
       { error: ERROR_MESSAGE.INVALID_CATEGORY },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       console.error(userError);
       return NextResponse.json(
         { error: ERROR_MESSAGE.UNAUTHORIZED },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    // 7. insert nano-banana
+    // 7. insert portrait
     const { data: insertResult, error: insertError } = await supabase
       .from(TABLE_NAME)
       .insert(uploadObject)
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(
           { error: ERROR_MESSAGE.FAILED_TO_INSERT_TABLE_NANO_BANANA },
-          { status: 500 }
+          { status: 500 },
         );
       } else if (
         error.message === ERROR_MESSAGE.FAILED_TO_UPLOAD_IMAGE ||
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
               ERROR_MESSAGE.FAILED_TO_UPLOAD_IMAGE ||
               ERROR_MESSAGE.FAILED_TO_GET_PUBLIC_URL,
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
     } else {
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { error: ERROR_MESSAGE.INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
   if (!category) {
     return NextResponse.json(
       { error: ERROR_MESSAGE.INVALID_CATEGORY },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -185,7 +185,7 @@ export async function GET(request: NextRequest) {
       console.error(userError);
       return NextResponse.json(
         { error: ERROR_MESSAGE.UNAUTHORIZED },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -200,14 +200,14 @@ export async function GET(request: NextRequest) {
       console.error(error);
       return NextResponse.json(
         { error: ERROR_MESSAGE.INTERNAL_SERVER_ERROR },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     if (!data) {
       return NextResponse.json(
         { error: ERROR_MESSAGE.NOT_FOUND },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -216,7 +216,7 @@ export async function GET(request: NextRequest) {
     console.error(error);
     return NextResponse.json(
       { error: ERROR_MESSAGE.INTERNAL_SERVER_ERROR },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

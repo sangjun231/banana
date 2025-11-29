@@ -40,7 +40,7 @@ export default function FourCutPage() {
         console.log("🖼️ Combining images with padding before sending...");
         const combinedImageUrl = await combineImagesVertically(
           uploadedImages,
-          true // 여백 추가 - 여백 부분을 AI가 채울 것
+          true, // 여백 추가 - 여백 부분을 AI가 채울 것
         );
         const combinedBase64 = combinedImageUrl.split(",")[1]; // data:image/png;base64, 제거
         requestBody.combinedImage = combinedBase64;

@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     if (!images || images.length === 0 || !mood || !styleType) {
       return NextResponse.json(
         { error: "이미지, 분위기, 스타일 타입을 모두 선택해주세요" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -60,14 +60,14 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { error: "로그인이 필요합니다" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     console.log(
       `🎨 Style Type: ${
         styleType === "background-change" ? "배경 변환" : "프레임 추가"
-      }`
+      }`,
     );
     console.log(`🎭 Mood: ${mood}`);
     console.log(`📸 Images count: ${images.length}`);
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       if (!combinedImage) {
         return NextResponse.json(
           { error: "합쳐진 이미지가 필요합니다" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         const result = await generatePortrait(
           images[i],
           restPrompt,
-          firstResult.generatedImage // 참조 이미지로 전달
+          firstResult.generatedImage, // 참조 이미지로 전달
         );
         generatedImages.push(result.generatedImage);
       }
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
         error: "포트레이트 생성 중 오류가 발생했습니다",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
