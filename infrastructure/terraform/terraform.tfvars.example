@@ -1,0 +1,17 @@
+# 변수 값 예시
+# 이 파일을 복사해서 terraform.tfvars로 만들고 실제 값 입력
+# terraform.tfvars는 .gitignore에 포함되어 있어 Git에 올라가지 않음
+
+aws_region          = "ap-northeast-2"
+environment         = "dev"
+project_name        = "websocket-chat"
+budget_alert_email  = "your-email@example.com"
+
+# 비용 관리
+monthly_budget_limit = 50
+
+# ECS 설정 (비용 절감을 위해 최소 사양)
+ecs_task_cpu        = 256
+ecs_task_memory     = 512
+ecs_desired_count   = 1
+
