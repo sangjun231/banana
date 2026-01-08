@@ -39,7 +39,7 @@ export default function MyPage() {
           {images
             .filter(
               (image: Portrait): image is Portrait & { image_url: string } =>
-                !!image.image_url,
+                !!image.image_url
             )
             .map((image) => (
               <Card key={image.id}>
