@@ -8,14 +8,15 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "src/**/*",
-      "app/**/*",
+      "frontend/src/**/*",
+      "frontend/app/**/*",
+      "backend/src/**/*",
       "!node_modules",
       "!.next",
       "!dist",
       "!build",
       "!public",
-      "!src/components/ui"
+      "!frontend/src/components/ui"
     ]
   },
   "formatter": {
