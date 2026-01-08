@@ -14,5 +14,3 @@ export function getImageAltText(image: Portrait): string {
   // 그렇지 않으면 기본값 반환
   return "이미지";
 }
-
-

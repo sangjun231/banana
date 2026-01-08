@@ -1,5 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get } from "@nestjs/common";
+import { AppService } from "./app.service";
 
 @Controller()
 export class AppController {
@@ -10,11 +10,11 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('health')
+  @Get("health")
   getHealth() {
     return {
-      status: 'ok',
-      message: 'Backend is running!',
+      status: "ok",
+      message: "Backend is running!",
       timestamp: new Date().toISOString(),
     };
   }

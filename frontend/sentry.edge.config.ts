@@ -26,3 +26,4 @@ Sentry.init({
   // 원본 (Wizard 기본값):
   // sendDefaultPii: true, // Enable sending user PII
 });
+
