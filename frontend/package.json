@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --experimental-https --experimental-https-key ../backend/certs/localhost+2-key.pem --experimental-https-cert ../backend/certs/localhost+2.pem --hostname 0.0.0.0",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "biome lint .",

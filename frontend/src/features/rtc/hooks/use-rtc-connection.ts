@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <explanation> */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 import type { RtcRole, RtcSignalPayload } from "../types";
@@ -44,14 +45,26 @@ export function useRtcConnection({
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const readyRef = useRef(false);
   const roleRef = useRef<RtcRole | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
   const pendingCandidatesRef = useRef<RTCIceCandidateInit[]>([]);
   const hasSentReadyRef = useRef(false);
+  const handleSignalRef = useRef<
+    (payload: RtcSignalPayload) => Promise<void> | void
+  >(async () => {});
+  const createOfferRef = useRef<() => Promise<void>>(async () => {});
+  const ensurePeerConnectionRef = useRef<() => RTCPeerConnection | null>(
+    () => null,
+  );
 
   const iceServers = useMemo(() => parseIceServers(), []);
 
   useEffect(() => {
     roleRef.current = role;
   }, [role]);
+
+  useEffect(() => {
+    localStreamRef.current = localStream;
+  }, [localStream]);
 
   const sendSignal = useCallback(
     (payload: RtcSignalPayload) => {
@@ -64,6 +77,20 @@ export function useRtcConnection({
     },
     [roomId],
   );
+
+  const emitReadyIfPossible = useCallback(() => {
+    if (
+      !socketRef.current ||
+      !localStreamRef.current ||
+      !roleRef.current ||
+      hasSentReadyRef.current
+    ) {
+      return;
+    }
+
+    socketRef.current.emit("rtc:ready", { roomId });
+    hasSentReadyRef.current = true;
+  }, [roomId]);
 
   const createOffer = useCallback(async () => {
     const pc = pcRef.current;
@@ -222,6 +249,8 @@ export function useRtcConnection({
     socketRef.current = socket;
 
     socket.on("connect", () => {
+      readyRef.current = false;
+      hasSentReadyRef.current = false;
       socket.emit("rtc:join", { roomId });
     });
 
@@ -239,18 +268,26 @@ export function useRtcConnection({
     socket.on("rtc:ready", () => {
       readyRef.current = true;
       if (roleRef.current === "caller") {
-        void createOffer();
+        const pc = ensurePeerConnectionRef.current();
+        if (pc) {
+          void createOfferRef.current();
+        }
       }
     });
 
     socket.on("rtc:signal", ({ payload }: { payload: RtcSignalPayload }) => {
-      void handleSignal(payload);
+      void handleSignalRef.current(payload);
     });
 
     socket.on("rtc:peer-left", () => {
       setRemoteStream(null);
       readyRef.current = false;
       hasSentReadyRef.current = false;
+      pcRef.current?.close();
+      pcRef.current = null;
+      setConnectionState("new");
+      setRole("caller");
+      emitReadyIfPossible();
     });
 
     socket.on("disconnect", () => {
@@ -260,7 +297,19 @@ export function useRtcConnection({
     return () => {
       leave();
     };
-  }, [createOffer, handleSignal, leave, roomId]);
+  }, [emitReadyIfPossible, leave, roomId]);
+
+  useEffect(() => {
+    handleSignalRef.current = handleSignal;
+  }, [handleSignal]);
+
+  useEffect(() => {
+    createOfferRef.current = createOffer;
+  }, [createOffer]);
+
+  useEffect(() => {
+    ensurePeerConnectionRef.current = ensurePeerConnection;
+  }, [ensurePeerConnection]);
 
   useEffect(() => {
     if (!localStream) {
@@ -271,13 +320,8 @@ export function useRtcConnection({
   }, [ensurePeerConnection, localStream]);
 
   useEffect(() => {
-    if (!socketRef.current || !localStream || !role || hasSentReadyRef.current) {
-      return;
-    }
-
-    socketRef.current.emit("rtc:ready", { roomId });
-    hasSentReadyRef.current = true;
-  }, [localStream, role, roomId]);
+    emitReadyIfPossible();
+  }, [emitReadyIfPossible, localStream, role]);
 
   useEffect(() => {
     const pc = pcRef.current;

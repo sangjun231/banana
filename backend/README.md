@@ -27,4 +27,5 @@ pnpm start:prod
 
 - `PORT` - 서버 포트 (기본값: 3001)
 - `FRONTEND_URL` - 프론트엔드 URL (CORS용, 기본값: http://localhost:3000)
-
+- `SSL_KEY_PATH` - HTTPS 키 파일 경로 (설정 시 HTTPS/WSS 활성화)
+- `SSL_CERT_PATH` - HTTPS 인증서 파일 경로 (설정 시 HTTPS/WSS 활성화)
