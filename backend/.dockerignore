@@ -1,0 +1,18 @@
+# Docker 빌드 시 제외할 파일들
+
+node_modules
+dist
+.git
+.gitignore
+.env
+.env.local
+*.log
+coverage
+.nyc_output
+.vscode
+.idea
+*.md
+test
+*.spec.ts
+*.spec.js
+

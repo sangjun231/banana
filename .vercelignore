@@ -1,0 +1,22 @@
+# Vercel은 frontend 폴더만 배포하므로 나머지 제외
+
+# 백엔드 및 인프라스트럭처 제외
+backend/
+infrastructure/
+*.tf
+*.tfvars
+
+# 루트 레벨 파일들 제외 (frontend 폴더만 필요)
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+README.md
+SENTRY_SETUP.md
+test.md
+docs/
+
+# node_modules는 Vercel이 기본적으로 무시하지만 명시적으로 추가
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+

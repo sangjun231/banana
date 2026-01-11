@@ -1,0 +1,10 @@
+    NEXT_PUBLIC_SUPABASE_URL=                        # Eun supabase URL
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=...                # Eun supabase 키
+    NEXT_PUBLIC_URL=...
+    NEXT_PUBLIC_JUN_SUPABASE_URL=...                 # Jun supabase URL
+    NEXT_PUBLIC_JUN_SUPABASE_ANON_KEY=...            # Jun supabase 키
+    SUPABASE_PROJECT_ID=...
+    GOOGLE_AI_API_KEY=...                            # Gemini API 키
+    NEXT_PUBLIC_SENTRY_DSN=...                       # Sentry DSN
+    NEXT_PUBLIC_RTC_SIGNALING_URL=...                # RTC 시그널링 서버 URL
+    NEXT_PUBLIC_RTC_ICE_SERVERS=...                  # RTC ICE 서버 JSON 문자열
