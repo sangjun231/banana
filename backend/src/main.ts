@@ -5,8 +5,16 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // CORS 설정 (Next.js와 통신하기 위해)
+  const rawOrigins = process.env.FRONTEND_URL;
+  const originList = rawOrigins
+    ? rawOrigins
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+    : ["http://localhost:3000"];
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: originList,
     credentials: true,
   });
 
