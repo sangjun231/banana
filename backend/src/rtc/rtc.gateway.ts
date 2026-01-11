@@ -7,6 +7,12 @@ import {
 import { Server, Socket } from "socket.io";
 import { RtcService } from "./rtc.service";
 
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  : ["http://localhost:3000"];
+
 type RtcRole = "caller" | "callee";
 
 type RtcJoinPayload = {
@@ -41,7 +47,7 @@ type RtcLeavePayload = {
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: allowedOrigins,
     credentials: true,
   },
 })
