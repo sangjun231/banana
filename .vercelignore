@@ -6,10 +6,7 @@ infrastructure/
 *.tf
 *.tfvars
 
-# 루트 레벨 파일들 제외 (frontend 폴더만 필요)
-package.json
-pnpm-lock.yaml
-pnpm-workspace.yaml
+# 루트 레벨 파일들 제외 (pnpm 모노레포 관련 파일은 유지)
 README.md
 SENTRY_SETUP.md
 test.md
