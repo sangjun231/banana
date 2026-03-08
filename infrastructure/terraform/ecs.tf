@@ -106,10 +106,9 @@ resource "aws_ecs_service" "main" {
   }
 
   # 서비스가 중단되어도 자동으로 재시작
-  deployment_configuration {
-    maximum_percent         = 200
-    minimum_healthy_percent = 100
-  }
+  # AWS Provider 5.0에서는 deployment_configuration 블록이 지원되지 않음
+  # 대신 기본값 사용 (maximum_percent: 200, minimum_healthy_percent: 100)
+  # 필요시 aws_ecs_service 리소스의 deployment_configuration 속성 사용
 
   # ALB가 정상일 때만 서비스 시작
   depends_on = [aws_lb_listener.main, aws_lb_target_group.main]

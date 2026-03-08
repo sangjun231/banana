@@ -24,7 +24,14 @@
     "coverage": "pnpm --filter frontend coverage",
     "test:e2e": "pnpm --filter frontend test:e2e",
     "test:e2e:ui": "pnpm --filter frontend test:e2e:ui",
-    "test:ci": "pnpm --filter frontend test:ci"
+    "test:ci": "pnpm --filter frontend test:ci",
+    "terraform:init": "cd infrastructure/terraform && terraform init",
+    "terraform:plan": "cd infrastructure/terraform && terraform plan",
+    "terraform:apply": "cd infrastructure/terraform && terraform apply",
+    "terraform:destroy": "cd infrastructure/terraform && terraform destroy",
+    "terraform:validate": "cd infrastructure/terraform && terraform validate",
+    "terraform:fmt": "cd infrastructure/terraform && terraform fmt",
+    "terraform:output": "cd infrastructure/terraform && terraform output"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.4",
