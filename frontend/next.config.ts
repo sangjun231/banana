@@ -1,11 +1,17 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
-import { config } from "dotenv";
-import { resolve } from "path";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
 
-// 루트 디렉토리의 .env.local 파일 로드
-// frontend/ 폴더에서 실행되므로 상위 디렉토리(../)를 참조
-config({ path: resolve(__dirname, "../.env.local") });
+// ES 모듈에서 __dirname 대체
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 로컬 개발 시에만 루트의 .env.local 로드 (Vercel에서는 환경변수가 자동 주입됨)
+if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+  const { config } = await import("dotenv");
+  config({ path: resolve(__dirname, "../.env.local") });
+}
 
 const nextConfig: NextConfig = {
   /* config options here */
