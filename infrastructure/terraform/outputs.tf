@@ -1,28 +1,32 @@
-# 출력값 정의
-# Terraform 실행 후 필요한 정보를 출력
+# Terraform 출력값 - EC2 버전
+# terraform apply 완료 후 필요한 정보 출력
 
 output "vpc_id" {
-  description = "생성된 VPC ID"
+  description = "VPC ID"
   value       = aws_vpc.main.id
 }
 
-output "ecs_cluster_name" {
-  description = "ECS 클러스터 이름"
-  value       = aws_ecs_cluster.main.name
+output "ec2_instance_id" {
+  description = "EC2 인스턴스 ID"
+  value       = aws_instance.main.id
 }
 
-output "ecr_repository_url" {
-  description = "ECR 리포지토리 URL (Docker 이미지 푸시용)"
-  value       = aws_ecr_repository.main.repository_url
+output "ec2_public_ip" {
+  description = "EC2 퍼블릭 IP (Elastic IP)"
+  value       = aws_eip.main.public_ip
 }
 
-output "alb_dns_name" {
-  description = "로드밸런서 DNS 이름 (서버 접속 URL)"
-  value       = aws_lb.main.dns_name
+output "backend_url" {
+  description = "백엔드 서버 URL"
+  value       = "http://${aws_eip.main.public_ip}:3001"
 }
 
-output "alb_arn" {
-  description = "로드밸런서 ARN"
-  value       = aws_lb.main.arn
+output "websocket_url" {
+  description = "WebSocket 연결 URL"
+  value       = "ws://${aws_eip.main.public_ip}:3001"
 }
 
+output "ssh_command" {
+  description = "SSH 접속 명령어"
+  value       = "ssh -i ~/.ssh/${var.ec2_key_name}.pem ec2-user@${aws_eip.main.public_ip}"
+}
