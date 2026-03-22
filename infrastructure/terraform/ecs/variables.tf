@@ -1,5 +1,5 @@
-# 변수 정의 - EC2 버전
-# EC2 단독 배포에 필요한 변수들
+# 변수 정의 - ECS 버전
+# ECS Fargate + ALB 배포에 필요한 변수들
 
 # ============================================================
 # 공통 설정
@@ -40,24 +40,25 @@ variable "availability_zones" {
 }
 
 # ============================================================
-# EC2 설정
+# ECS 설정
 # ============================================================
 
-variable "ec2_instance_type" {
-  description = "EC2 인스턴스 타입"
-  type        = string
-  default     = "t3.micro"
+variable "ecs_task_cpu" {
+  description = "ECS 태스크 CPU (256 = 0.25 vCPU)"
+  type        = number
+  default     = 256
 }
 
-variable "ec2_key_name" {
-  description = "EC2 SSH 키 페어 이름"
-  type        = string
+variable "ecs_task_memory" {
+  description = "ECS 태스크 메모리 (512 = 0.5 GB)"
+  type        = number
+  default     = 512
 }
 
-variable "ssh_allowed_cidr" {
-  description = "SSH 접속 허용 CIDR"
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
+variable "ecs_desired_count" {
+  description = "실행할 ECS 태스크 개수"
+  type        = number
+  default     = 1
 }
 
 # ============================================================
@@ -67,7 +68,7 @@ variable "ssh_allowed_cidr" {
 variable "monthly_budget_limit" {
   description = "월 예산 한도 (USD)"
   type        = number
-  default     = 50
+  default     = 100
 }
 
 variable "budget_alert_email" {
