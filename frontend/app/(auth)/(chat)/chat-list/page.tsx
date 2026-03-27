@@ -162,7 +162,14 @@ export default function ChatListPage() {
               value={peerId}
               onChange={(event) => setPeerId(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === "Enter") handleEnterRoom();
+                if (event.key !== "Enter" || event.shiftKey) {
+                  return;
+                }
+                if (event.nativeEvent.isComposing) {
+                  return;
+                }
+                event.preventDefault();
+                handleEnterRoom();
               }}
             />
             <Button onClick={handleEnterRoom}>시작</Button>
