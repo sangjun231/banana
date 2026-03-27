@@ -30,4 +30,8 @@ export const SIDEBAR_MENU = [
     label: "마이페이지",
     href: "/my-page",
   },
+  {
+    label: "채팅",
+    href: "/chat-list",
+  },
 ];
