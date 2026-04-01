@@ -18,7 +18,8 @@ import { SupabaseModule } from "./supabase/supabase.module";
     // envFilePath: 루트의 .env.local 파일에서 환경변수 로드
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: "../.env.local",
+      // 로컬: ../.env.local(모노레포 루트). 서버 배포: 이 디렉터리의 .env
+      envFilePath: [".env", ".env.local", "../.env.local"],
     }),
 
     // SupabaseModule: Supabase 클라이언트를 제공하는 모듈 (전역)

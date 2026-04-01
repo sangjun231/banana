@@ -18,7 +18,7 @@ type ChatMessage = {
   content: string;
   createdAt: string;
 };
-
+// next public api url
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_CHAT_WS_URL ?? "http://localhost:3001";
 
