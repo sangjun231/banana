@@ -60,6 +60,22 @@ variable "ssh_allowed_cidr" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "api_domain" {
+  description = "공개 API 호스트명 (nginx server_name·Let's Encrypt). 예: api.abcbanana.cc"
+  type        = string
+}
+
+variable "acme_email" {
+  description = "Let's Encrypt 계정·만료 알림 이메일"
+  type        = string
+}
+
+variable "expose_nest_port_publicly" {
+  description = "true면 3001을 인터넷에 직접 개방(디버그용). 운영에서는 false 권장(nginx(443)만 사용)"
+  type        = bool
+  default     = false
+}
+
 # ============================================================
 # 비용 관리
 # ============================================================

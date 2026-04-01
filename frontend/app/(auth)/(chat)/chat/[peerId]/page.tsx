@@ -18,7 +18,7 @@ type ChatMessage = {
   content: string;
   createdAt: string;
 };
-
+// next public api url
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_CHAT_WS_URL ?? "http://localhost:3001";
 
@@ -157,9 +157,15 @@ export default function ChatRoomPage() {
             value={input}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                handleSend();
+              if (event.key !== "Enter" || event.shiftKey) {
+                return;
               }
+              // macOS 한글 IME: 조합 중 Enter는 확정용 — 전송하면 마지막 글자가 잘리거나 한 글자만 더 나감
+              if (event.nativeEvent.isComposing) {
+                return;
+              }
+              event.preventDefault();
+              handleSend();
             }}
           />
           <Button onClick={handleSend}>전송</Button>

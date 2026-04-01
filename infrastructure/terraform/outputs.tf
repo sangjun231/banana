@@ -17,13 +17,13 @@ output "ec2_public_ip" {
 }
 
 output "backend_url" {
-  description = "백엔드 서버 URL"
-  value       = "http://${aws_eip.main.public_ip}:3001"
+  description = "백엔드 HTTPS URL (도메인 기준)"
+  value       = "https://${var.api_domain}"
 }
 
 output "websocket_url" {
-  description = "WebSocket 연결 URL"
-  value       = "ws://${aws_eip.main.public_ip}:3001"
+  description = "WebSocket URL (TLS)"
+  value       = "wss://${var.api_domain}"
 }
 
 output "ssh_command" {

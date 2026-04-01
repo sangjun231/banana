@@ -33,13 +33,16 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # NestJS 서버 포트 (3001)
-  ingress {
-    description = "NestJS API"
-    from_port   = 3001
-    to_port     = 3001
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  # Nest는 127.0.0.1:3001만 바인딩하고 외부는 nginx(443)만 쓰는 것을 권장
+  dynamic "ingress" {
+    for_each = var.expose_nest_port_publicly ? [1] : []
+    content {
+      description = "NestJS 직접 접속 (디버그 전용)"
+      from_port   = 3001
+      to_port     = 3001
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   # WebSocket 포트 (Socket.IO는 HTTP/HTTPS와 같은 포트 사용 가능)
