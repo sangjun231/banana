@@ -43,28 +43,13 @@ resource "aws_instance" "main" {
     }
   }
 
-  # 사용자 데이터 (인스턴스 시작 시 실행)
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    # 시스템 업데이트
-    dnf update -y
-    
-    # Node.js 20 설치
-    dnf install -y nodejs npm git
-    
-    # PM2 설치 (프로세스 매니저)
-    npm install -g pm2
-    
-    # 애플리케이션 디렉토리 생성
-    mkdir -p /home/ec2-user/app
-    chown ec2-user:ec2-user /home/ec2-user/app
-    
-    # CloudWatch Agent 설치 (선택사항 - 로그 모니터링)
-    # dnf install -y amazon-cloudwatch-agent
-    
-    echo "EC2 초기 설정 완료" > /home/ec2-user/setup-complete.txt
-  EOF
-  )
+  # 사용자 데이터: nginx 리버스 프록시(3001) + Let's Encrypt(certbot) + 80→443 리다이렉트
+  # user_data 변경 시 인스턴스 교체(create_before_destroy)될 수 있음.
+  # DNS(A/프록시)가 LE 검증 전에 붙지 않으면 certbot 루프가 끝난 뒤 SSH로 수동 발급 필요(setup-complete.txt 참고).
+  user_data = base64encode(templatefile("${path.module}/templates/ec2-user-data.sh.tpl", {
+    domain     = var.api_domain
+    acme_email = var.acme_email
+  }))
 
   tags = {
     Name = "${var.project_name}-ec2"
