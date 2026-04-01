@@ -60,3 +60,9 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+
+# scripts
+scripts/ex.md
+
+#backend
+backend.env
