@@ -9,6 +9,7 @@ import { ConfigModule } from "@nestjs/config";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { ChatModule } from "./chat/chat.module";
+import { RtcModule } from "./rtc/rtc.module";
 import { SupabaseModule } from "./supabase/supabase.module";
 
 @Module({
@@ -27,6 +28,9 @@ import { SupabaseModule } from "./supabase/supabase.module";
 
     // ChatModule: 채팅 기능을 담당하는 모듈
     ChatModule,
+
+    // RtcModule: 1:1 WebRTC 시그널링 기능
+    RtcModule,
   ],
   controllers: [AppController],
   providers: [AppService],
