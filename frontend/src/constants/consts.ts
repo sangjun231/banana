@@ -34,4 +34,8 @@ export const SIDEBAR_MENU = [
     label: "채팅",
     href: "/chat-list",
   },
+  {
+    label: "RTC",
+    href: "/rtc",
+  },
 ];

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "pnpm --filter frontend dev",
     "dev:backend": "pnpm --filter backend start:dev",
+    "dev:rtc": "pnpm --filter frontend dev:rtc",
     "build": "pnpm --filter frontend build",
     "build:backend": "pnpm --filter backend build",
     "start": "pnpm --filter frontend start",
