@@ -79,6 +79,9 @@ export class RtcGateway {
     this.clientRoomMap.set(client.id, roomId);
 
     client.emit("rtc:joined", { roomId, role });
+    if (role === "callee") {
+      client.to(roomId).emit("rtc:peer-joined", { roomId });
+    }
     this.logger.log(`RTC join: ${client.id} -> ${roomId} (${role})`);
   }
 

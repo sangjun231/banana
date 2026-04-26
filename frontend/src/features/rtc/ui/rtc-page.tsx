@@ -39,12 +39,24 @@ export function RtcPage() {
     error: mediaError,
   } = useMediaStream();
 
-  const { remoteStream, role, connectionState, error, isRoomFull, leave } =
+  const {
+    remoteStream,
+    role,
+    hasPeer,
+    connectionState,
+    error,
+    isRoomFull,
+    leave,
+  } =
     useRtcConnection({
       roomId,
       localStream: cameraStream,
       screenStream,
     });
+
+  const remoteEmptyMessage = hasPeer
+    ? "상대가 입장했지만 아직 연결 중입니다."
+    : "상대가 아직 입장하지 않았습니다.";
 
   useEffect(() => {
     const param = searchParams.get("room");
@@ -131,7 +143,11 @@ export function RtcPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
-        <RtcVideo stream={remoteStream} label="상대 화면" />
+        <RtcVideo
+          stream={remoteStream}
+          label="상대 화면"
+          emptyMessage={remoteEmptyMessage}
+        />
         <RtcVideo stream={previewStream} label="내 화면" muted mirror />
       </div>
 

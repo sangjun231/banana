@@ -41,6 +41,7 @@ export function useRtcConnection({
     useState<RTCPeerConnectionState>("new");
   const [error, setError] = useState<string | null>(null);
   const [isRoomFull, setIsRoomFull] = useState(false);
+  const [hasPeer, setHasPeer] = useState(false);
 
   // 렌더링 중 재생성을 피하기 위해 장수 객체는 ref로 관리.
   const socketRef = useRef<Socket | null>(null);
@@ -87,14 +88,30 @@ export function useRtcConnection({
     [roomId],
   );
 
-  // 소켓/로컬 스트림/역할이 모두 준비되면 rtc:ready 전송.
+  // 이미 생성된 peer connection에 로컬 트랙을 중복 없이 동기화한다.
+  // (권한 허용이 늦거나 재입장으로 stream이 바뀌는 경우를 처리)
+  const syncLocalTracks = useCallback(
+    (pc: RTCPeerConnection, stream: MediaStream | null) => {
+      if (!stream) {
+        return;
+      }
+
+      for (const track of stream.getTracks()) {
+        const hasSender = pc
+          .getSenders()
+          .some((sender) => sender.track?.id === track.id);
+        if (!hasSender) {
+          pc.addTrack(track, stream);
+        }
+      }
+    },
+    [],
+  );
+
+  // 소켓/역할 준비 시 rtc:ready 전송.
+  // 현재 구현은 로컬 스트림이 없어도(recv-only) 연결 시도를 허용한다.
   const emitReadyIfPossible = useCallback(() => {
-    if (
-      !socketRef.current ||
-      !localStreamRef.current ||
-      !roleRef.current ||
-      hasSentReadyRef.current
-    ) {
+    if (!socketRef.current || !roleRef.current || hasSentReadyRef.current) {
       return;
     }
 
@@ -181,23 +198,25 @@ export function useRtcConnection({
     return pc;
   }, [iceServers, sendSignal, createOffer]);
 
-  // 로컬 미디어가 준비된 뒤에만 peer connection 생성.
+  // 로컬 미디어가 준비된 뒤 peer connection 생성.
+  // 로컬 미디어가 없으면 수신 전용 peer connection 생성.
   const ensurePeerConnection = useCallback(() => {
     if (pcRef.current) {
       return pcRef.current;
     }
 
-    if (!localStream) {
-      return null;
-    }
-
     const pc = createPeerConnection();
     pcRef.current = pc;
-    localStream.getTracks().forEach((track) => {
-      pc.addTrack(track, localStream);
-    });
+    syncLocalTracks(pc, localStream);
+
+    // 로컬 트랙이 없으면 수신 전용 트랜시버를 만들어 상대 영상/음성 수신을 허용.
+    if (!localStream) {
+      pc.addTransceiver("video", { direction: "recvonly" });
+      pc.addTransceiver("audio", { direction: "recvonly" });
+    }
+
     return pc;
-  }, [createPeerConnection, localStream]);
+  }, [createPeerConnection, localStream, syncLocalTracks]);
 
   // 수신한 시그널링 메시지(offer/answer/ICE) 처리.
   const handleSignal = useCallback(
@@ -278,8 +297,13 @@ export function useRtcConnection({
     // 서버가 caller/callee 역할을 부여.
     socket.on("rtc:joined", ({ role }: { role: RtcRole }) => {
       setRole(role);
+      setHasPeer(role === "callee");
       setIsRoomFull(false);
       setError(null);
+    });
+
+    socket.on("rtc:peer-joined", () => {
+      setHasPeer(true);
     });
 
     // 방이 가득 찼을 때(2명 초과).
@@ -307,6 +331,7 @@ export function useRtcConnection({
     // 상대가 나가면 상태 초기화 후 대기.
     socket.on("rtc:peer-left", () => {
       setRemoteStream(null);
+      setHasPeer(false);
       readyRef.current = false;
       hasSentReadyRef.current = false;
       pcRef.current?.close();
@@ -342,12 +367,12 @@ export function useRtcConnection({
 
   // 로컬 미디어 준비 후 peer connection 보장.
   useEffect(() => {
-    if (!localStream) {
+    const pc = ensurePeerConnection();
+    if (!pc) {
       return;
     }
-
-    ensurePeerConnection();
-  }, [ensurePeerConnection, localStream]);
+    syncLocalTracks(pc, localStream);
+  }, [ensurePeerConnection, localStream, syncLocalTracks]);
 
   useEffect(() => {
     emitReadyIfPossible();
@@ -379,6 +404,7 @@ export function useRtcConnection({
   return {
     remoteStream,
     role,
+    hasPeer,
     connectionState,
     error,
     isRoomFull,

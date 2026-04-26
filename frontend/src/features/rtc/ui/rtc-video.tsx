@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 type RtcVideoProps = {
   stream: MediaStream | null;
   label: string;
+  emptyMessage?: string;
   muted?: boolean;
   mirror?: boolean;
 };
@@ -13,6 +14,7 @@ type RtcVideoProps = {
 export function RtcVideo({
   stream,
   label,
+  emptyMessage = "연결 대기 중",
   muted = false,
   mirror = false,
 }: RtcVideoProps) {
@@ -38,7 +40,7 @@ export function RtcVideo({
         />
       ) : (
         <div className="flex h-full min-h-[260px] items-center justify-center bg-muted text-muted-foreground">
-          연결 대기 중
+          {emptyMessage}
         </div>
       )}
       <span className="absolute top-3 left-3 rounded-full bg-black/70 px-3 py-1 text-white text-xs">
