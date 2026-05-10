@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUserQuery } from "@/features/auth/queries";
+import { socketServerUrl } from "@/lib/socket-url";
 import { cn } from "@/lib/utils";
 
 type ChatMessage = {
@@ -18,10 +19,6 @@ type ChatMessage = {
   content: string;
   createdAt: string;
 };
-// next public api url
-const SOCKET_URL =
-  process.env.NEXT_PUBLIC_CHAT_WS_URL ?? "http://localhost:3001";
-
 export default function ChatRoomPage() {
   const router = useRouter();
   const params = useParams<{ peerId: string }>();
@@ -40,7 +37,7 @@ export default function ChatRoomPage() {
       return;
     }
 
-    const socket = io(SOCKET_URL, { transports: ["websocket"] });
+    const socket = io(socketServerUrl, { transports: ["websocket"] });
     socketRef.current = socket;
 
     socket.on("connect", () => {
