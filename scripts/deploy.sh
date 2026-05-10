@@ -13,7 +13,7 @@ REMOTE_DIR="${REMOTE_DIR:-/home/ec2-user/banana-backend}"
 PM2_APP_NAME="${PM2_APP_NAME:-api}"
 DEPLOY_ENV_FILE="${DEPLOY_ENV_FILE:-}"
 
-SSH_OPTS=(-i "$SSH_KEY" -o StrictHostKeyChecking=accept-new)
+SSH_OPTS=(-i "$SSH_KEY" -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes)
 
 if [[ -z "$DEPLOY_HOST" ]]; then
   echo "DEPLOY_HOST 가 비어 있습니다. 예: export DEPLOY_HOST=<EIP>" >&2
@@ -40,8 +40,15 @@ pnpm --filter backend build
 echo "==> 원격 디렉터리 준비 (dist 비우기 — 이전 빌드 잔여 제거)"
 ssh "${SSH_OPTS[@]}" "${DEPLOY_USER}@${DEPLOY_HOST}" "rm -rf '${REMOTE_DIR}/dist' && mkdir -p '${REMOTE_DIR}/dist'"
 
-echo "==> scp dist + package.json"
-scp "${SSH_OPTS[@]}" -r "${BACKEND}/dist/." "${DEPLOY_USER}@${DEPLOY_HOST}:${REMOTE_DIR}/dist/"
+echo "==> dist 업로드 (tar | ssh) + package.json (scp)"
+# Git for Windows의 scp는 소스 경로로 `.` 를 쓰면 `unexpected filename: .` 로 실패하는 경우가 많아
+# 디렉터리 전체는 tar 스트림으로 전송한다.
+if [[ ! -d "${BACKEND}/dist" ]]; then
+  echo "빌드 산출물이 없습니다: ${BACKEND}/dist" >&2
+  exit 1
+fi
+tar -C "${BACKEND}/dist" -cf - . | ssh "${SSH_OPTS[@]}" "${DEPLOY_USER}@${DEPLOY_HOST}" "tar -C '${REMOTE_DIR}/dist' -xf -"
+
 scp "${SSH_OPTS[@]}" "${BACKEND}/package.json" "${DEPLOY_USER}@${DEPLOY_HOST}:${REMOTE_DIR}/"
 
 if [[ -n "$DEPLOY_ENV_FILE" ]]; then

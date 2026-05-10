@@ -91,13 +91,18 @@ export function useRtcConnection({
 
   // 이미 생성된 peer connection에 로컬 트랙을 중복 없이 동기화한다.
   // (권한 허용이 늦거나 재입장으로 stream이 바뀌는 경우를 처리)
+  // m-line 순서를 브라우저 간에 맞추기 위해 audio → video 순으로 addTrack 한다.
   const syncLocalTracks = useCallback(
     (pc: RTCPeerConnection, stream: MediaStream | null) => {
       if (!stream) {
         return;
       }
 
-      for (const track of stream.getTracks()) {
+      const tracks = [
+        ...stream.getAudioTracks(),
+        ...stream.getVideoTracks(),
+      ];
+      for (const track of tracks) {
         const hasSender = pc
           .getSenders()
           .some((sender) => sender.track?.id === track.id);
@@ -110,9 +115,14 @@ export function useRtcConnection({
   );
 
   // 소켓/역할 준비 시 rtc:ready 전송.
-  // 로컬 스트림이 없어도(recv-only) 연결 시도를 허용한다.
+  // caller는 recvonly 트랜시버 없이 바로 addTrack 하기 위해 카메라(로컬 스트림)가 있을 때만 ready —
+  // 그렇지 않으면 첫 offer와 addTrack 이후 offer의 m-line 순서가 달라져 InvalidAccessError 가 난다.
   const emitReadyIfPossible = useCallback(() => {
     if (!socketRef.current || !roleRef.current || hasSentReadyRef.current) {
+      return;
+    }
+
+    if (roleRef.current === "caller" && !localStreamRef.current) {
       return;
     }
 
@@ -187,34 +197,29 @@ export function useRtcConnection({
       setConnectionState(pc.connectionState);
     };
 
-    // 재협상이 필요할 때는 caller만 offer를 시작.
-    pc.onnegotiationneeded = async () => {
-      if (roleRef.current !== "caller" || !readyRef.current) {
-        return;
-      }
-      await createOffer();
-    };
+    // 초기 offer는 rtc:ready 한 번에서만 보낸다. 여기서 createOffer 를 또 호출하면
+    // (recvonly 제거 후에도) addTrack 타이밍에 따라 m-line 순서 불일치 InvalidAccessError 가 난다.
+    // 화면 공유는 replaceTrack 으로 처리한다.
 
     setConnectionState(pc.connectionState);
     return pc;
-  }, [iceServers, sendSignal, createOffer]);
+  }, [iceServers, sendSignal]);
 
   // 로컬 미디어가 준비된 뒤 peer connection 생성.
-  // 로컬 미디어가 없으면 수신 전용 peer connection 생성.
+  // caller 는 로컬 스트림이 있을 때만 PC 를 만든다 (빈 PC + recvonly + addTrack 혼합 방지).
   const ensurePeerConnection = useCallback(() => {
     if (pcRef.current) {
+      syncLocalTracks(pcRef.current, localStream);
       return pcRef.current;
+    }
+
+    if (roleRef.current === "caller" && !localStream) {
+      return null;
     }
 
     const pc = createPeerConnection();
     pcRef.current = pc;
     syncLocalTracks(pc, localStream);
-
-    // 로컬 트랙이 없으면 수신 전용 트랜시버를 만들어 상대 영상/음성 수신을 허용.
-    if (!localStream) {
-      pc.addTransceiver("video", { direction: "recvonly" });
-      pc.addTransceiver("audio", { direction: "recvonly" });
-    }
 
     return pc;
   }, [createPeerConnection, localStream, syncLocalTracks]);
