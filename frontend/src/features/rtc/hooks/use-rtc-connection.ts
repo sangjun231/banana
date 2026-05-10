@@ -1,6 +1,7 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: we need to use exhaustive dependencies */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
+import { socketServerUrl } from "@/lib/socket-url";
 import type { RtcRole, RtcSignalPayload } from "../types";
 
 type UseRtcConnectionParams = {
@@ -109,7 +110,7 @@ export function useRtcConnection({
   );
 
   // 소켓/역할 준비 시 rtc:ready 전송.
-  // 현재 구현은 로컬 스트림이 없어도(recv-only) 연결 시도를 허용한다.
+  // 로컬 스트림이 없어도(recv-only) 연결 시도를 허용한다.
   const emitReadyIfPossible = useCallback(() => {
     if (!socketRef.current || !roleRef.current || hasSentReadyRef.current) {
       return;
@@ -282,9 +283,7 @@ export function useRtcConnection({
     }
 
     // 시그널링 서버 연결 및 RTC 이벤트 리스너 등록.
-    const signalingUrl =
-      process.env.NEXT_PUBLIC_RTC_SIGNALING_URL || "http://localhost:3001";
-    const socket = io(signalingUrl, { transports: ["websocket"] });
+    const socket = io(socketServerUrl, { transports: ["websocket"] });
 
     socketRef.current = socket;
 

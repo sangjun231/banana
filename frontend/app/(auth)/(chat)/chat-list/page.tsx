@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserQuery } from "@/features/auth/queries";
+import { socketServerUrl } from "@/lib/socket-url";
 import { cn } from "@/lib/utils";
 
 // 채팅방 요약 정보 타입
@@ -29,9 +30,6 @@ type ChatMessage = {
   createdAt: string;
 };
 
-const SOCKET_URL =
-  process.env.NEXT_PUBLIC_CHAT_WS_URL ?? "http://localhost:3001";
-
 export default function ChatListPage() {
   const router = useRouter();
   const { data: user, isLoading: isUserLoading } = useUserQuery();
@@ -44,7 +42,7 @@ export default function ChatListPage() {
   useEffect(() => {
     if (!user?.id) return;
 
-    const newSocket = io(SOCKET_URL, { transports: ["websocket"] });
+    const newSocket = io(socketServerUrl, { transports: ["websocket"] });
     setSocket(newSocket);
 
     newSocket.on("connect", () => {

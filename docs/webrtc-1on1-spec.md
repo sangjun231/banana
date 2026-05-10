@@ -152,8 +152,8 @@ backend/src/rtc/
 ### Frontend
 
 ```env
-# 시그널링 서버 URL
-NEXT_PUBLIC_RTC_SIGNALING_URL=http://localhost:3001
+# Socket.IO 서버 URL (채팅·RTC 시그널링 공통)
+NEXT_PUBLIC_SOCKET_URL=http://localhost:3001
 
 # ICE 서버 설정 (JSON 문자열)
 NEXT_PUBLIC_RTC_ICE_SERVERS=[{"urls":"stun:stun.l.google.com:19302"}]

@@ -206,7 +206,7 @@ export type RtcSignalPayload =
 
 ### Frontend
 
-- `NEXT_PUBLIC_RTC_SIGNALING_URL` : 시그널링 서버 URL (기본값: http://localhost:3001)
+- `NEXT_PUBLIC_SOCKET_URL` : Socket.IO 서버 URL — 채팅·RTC 시그널링 공통 (기본값: http://localhost:3001)
 - `NEXT_PUBLIC_RTC_ICE_SERVERS` : ICE 서버 JSON 문자열
   - 예: `[{"urls":"stun:stun.l.google.com:19302"}]`
   - 미설정 시 기본 STUN 사용
