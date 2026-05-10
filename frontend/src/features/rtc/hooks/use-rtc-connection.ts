@@ -115,14 +115,15 @@ export function useRtcConnection({
   );
 
   // 소켓/역할 준비 시 rtc:ready 전송.
-  // caller는 recvonly 트랜시버 없이 바로 addTrack 하기 위해 카메라(로컬 스트림)가 있을 때만 ready —
-  // 그렇지 않으면 첫 offer와 addTrack 이후 offer의 m-line 순서가 달라져 InvalidAccessError 가 난다.
+  // 테스트 단계: 양쪽 모두 카메라(비디오 트랙)까지 붙은 뒤에만 협상 시작 — offer/answer 타이밍 꼬임 방지.
+  // (나중에 마이크만·입장만 먼저 등은 여기 조건만 완화하면 됨.)
   const emitReadyIfPossible = useCallback(() => {
     if (!socketRef.current || !roleRef.current || hasSentReadyRef.current) {
       return;
     }
 
-    if (roleRef.current === "caller" && !localStreamRef.current) {
+    const stream = localStreamRef.current;
+    if (!stream || stream.getVideoTracks().length === 0) {
       return;
     }
 
