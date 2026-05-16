@@ -21,11 +21,17 @@ export function RtcVideo({
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (!videoRef.current) {
+    const el = videoRef.current;
+    if (!el) {
       return;
     }
 
-    videoRef.current.srcObject = stream;
+    el.srcObject = stream;
+    if (stream) {
+      void el.play().catch(() => {
+        /* 일부 모바일 브라우저는 srcObject 직후 명시적 play 가 필요 */
+      });
+    }
   }, [stream]);
 
   return (
