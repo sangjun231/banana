@@ -55,6 +55,8 @@ export function useRtcConnection({
   const pendingCandidatesRef = useRef<RTCIceCandidateInit[]>([]);
   // 재렌더링 시 ready 이벤트 중복 전송 방지.
   const hasSentReadyRef = useRef(false);
+  // caller offer 중복 전송 방지 (rtc:ready 재발화·재접속 시 ICE 꼬임 방지).
+  const hasSentOfferRef = useRef(false);
   // Socket.IO 리스너 재등록을 피하기 위해 콜백을 ref로 저장.
   const handleSignalRef = useRef<
     (payload: RtcSignalPayload) => Promise<void> | void
@@ -98,10 +100,7 @@ export function useRtcConnection({
         return;
       }
 
-      const tracks = [
-        ...stream.getAudioTracks(),
-        ...stream.getVideoTracks(),
-      ];
+      const tracks = [...stream.getAudioTracks(), ...stream.getVideoTracks()];
       for (const track of tracks) {
         const hasSender = pc
           .getSenders()
@@ -234,6 +233,9 @@ export function useRtcConnection({
       }
 
       if (payload.type === "offer") {
+        if (pc.signalingState === "stable") {
+          return;
+        }
         await pc.setRemoteDescription({ type: "offer", sdp: payload.sdp });
         for (const candidate of pendingCandidatesRef.current) {
           await pc.addIceCandidate(candidate);
@@ -280,6 +282,7 @@ export function useRtcConnection({
     setRemoteStream(null);
     readyRef.current = false;
     hasSentReadyRef.current = false;
+    hasSentOfferRef.current = false;
     setConnectionState("closed");
   }, [roomId]);
 
@@ -296,7 +299,14 @@ export function useRtcConnection({
     socket.on("connect", () => {
       readyRef.current = false;
       hasSentReadyRef.current = false;
+      hasSentOfferRef.current = false;
       socket.emit("rtc:join", { roomId });
+    });
+
+    socket.on("connect_error", (err) => {
+      setError(
+        `시그널링 서버 연결 실패: ${err.message}. NEXT_PUBLIC_SOCKET_URL을 확인하세요.`,
+      );
     });
 
     // 서버가 caller/callee 역할을 부여.
@@ -320,9 +330,10 @@ export function useRtcConnection({
     // 양쪽 준비 완료 시 caller가 offer 시작.
     socket.on("rtc:ready", () => {
       readyRef.current = true;
-      if (roleRef.current === "caller") {
+      if (roleRef.current === "caller" && !hasSentOfferRef.current) {
         const pc = ensurePeerConnectionRef.current();
         if (pc) {
+          hasSentOfferRef.current = true;
           void createOfferRef.current();
         }
       }
@@ -339,6 +350,7 @@ export function useRtcConnection({
       setHasPeer(false);
       readyRef.current = false;
       hasSentReadyRef.current = false;
+      hasSentOfferRef.current = false;
       pcRef.current?.close();
       pcRef.current = null;
       setConnectionState("new");
@@ -352,9 +364,20 @@ export function useRtcConnection({
     });
 
     return () => {
-      leave();
+      const socket = socketRef.current;
+      if (socket?.connected) {
+        socket.emit("rtc:leave", { roomId });
+      }
+      socket?.disconnect();
+      socketRef.current = null;
+      pcRef.current?.close();
+      pcRef.current = null;
+      pendingCandidatesRef.current = [];
+      readyRef.current = false;
+      hasSentReadyRef.current = false;
+      hasSentOfferRef.current = false;
     };
-  }, [emitReadyIfPossible, leave, roomId]);
+  }, [roomId]);
 
   useEffect(() => {
     handleSignalRef.current = handleSignal;

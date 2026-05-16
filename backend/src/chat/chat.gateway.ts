@@ -22,16 +22,13 @@ import {
   WebSocketServer,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+import { webSocketCorsOptions } from "../common/websocket-cors";
 import { ChatService } from "./chat.service";
 import { GetRoomsPayload, JoinPayload, MessagePayload } from "./chat.types";
 
 // WebSocketGateway 데코레이터: 이 클래스가 WebSocket 서버임을 선언
-// cors 설정: 프론트엔드(localhost:3000)에서의 접속을 허용
 @WebSocketGateway({
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    credentials: true,
-  },
+  cors: webSocketCorsOptions,
 })
 export class ChatGateway {
   // WebSocket 서버 인스턴스 (socket.io Server)

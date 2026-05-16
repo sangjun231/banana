@@ -20,7 +20,10 @@ function createFallbackRoomId() {
 export function RtcPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [roomId, setRoomId] = useState("");
+  // URL의 room을 첫 렌더부터 반영 — 빈 roomId로 소켓이 한 박자 늦게 열리는 것 방지
+  const [roomId, setRoomId] = useState(
+    () => searchParams.get("room")?.trim() ?? "",
+  );
   const [copyMessage, setCopyMessage] = useState("");
 
   const {
