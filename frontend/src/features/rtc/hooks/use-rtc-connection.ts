@@ -233,7 +233,8 @@ export function useRtcConnection({
       }
 
       if (payload.type === "offer") {
-        if (pc.signalingState === "stable") {
+        // 새 PC는 초기 상태가 stable이라, stable만 보면 callee가 첫 offer를 영원히 무시한다.
+        if (pc.remoteDescription?.type === "offer") {
           return;
         }
         await pc.setRemoteDescription({ type: "offer", sdp: payload.sdp });
